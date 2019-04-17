@@ -6,6 +6,7 @@ import argparse
 import re
 import logging
 import requests
+import geohash2
 
 ################################################################################
 # Global Variables
@@ -369,6 +370,9 @@ def main():
                 timestamp = int(calendar.timegm(time.strptime('{} {}'.format(
                     msg['gen_date'], msg['gen_time']
                 ), '%Y/%m/%d %H:%M:%S.%f')))
+		
+                geohash = geohash2.encode(msg.get('latitude'),msg.get('longitude'))
+                log.info('Geohash is {}'.format(geohash))
 
                 # Prepare data and tags so it can be sent to InfluxDB.
                 to_send.append({
@@ -376,6 +380,7 @@ def main():
                         'hexident': hexident,
                         'callsign': msg['callsign'],
                         'squawk': msg['squawk'],
+			'geohash': geohash2.encode(msg.get('latitude'),msg.get('longitude'))
                     },
                     'fields': {
                         'generated': timestamp,
@@ -396,9 +401,9 @@ def main():
             ap.clear(INTERVAL * 3)
             if len(to_send) > 0:
                 if influx.write('messages', to_send):
-                    log.info('Saved {} aircrafts to InfluxDB.'.format(len(to_send)))
+                    log.info('Saved {} aircraft to InfluxDB.'.format(len(to_send)))
             else:
-                log.info('No aircrafts to be saved in DB.')
+                log.info('No aircraft to save in DB.')
 
         try:
             msg = dump1090.receive()
