@@ -371,7 +371,11 @@ def main():
                     msg['gen_date'], msg['gen_time']
                 ), '%Y/%m/%d %H:%M:%S.%f')))
 		
-                geohash = geohash2.encode(msg.get('latitude'),msg.get('longitude'))
+                try:
+                    geohash = geohash2.encode(msg.get('latitude'),msg.get('longitude'))
+                except TypeError:
+                    log.info('Geohash returned a TypeError')
+
                 log.info('Geohash is {}'.format(geohash))
 
                 # Prepare data and tags so it can be sent to InfluxDB.
@@ -380,7 +384,7 @@ def main():
                         'hexident': hexident,
                         'callsign': msg['callsign'],
                         'squawk': msg['squawk'],
-			'geohash': geohash2.encode(msg.get('latitude'),msg.get('longitude'))
+			'geohash': geohash 
                     },
                     'fields': {
                         'generated': timestamp,
