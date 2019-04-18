@@ -376,6 +376,7 @@ def main():
                 except TypeError:
                     log.info('Geohash returned a TypeError')
 
+                #geohash = geohash2.encode(msg.get('latitude'),msg.get('longitude'))
                 log.info('Geohash is {}'.format(geohash))
 
                 # Prepare data and tags so it can be sent to InfluxDB.
